@@ -58,6 +58,7 @@ void UGrabber::Grab() {
 	// if we hit something then attac a physics handle
 	if (ActorHit) {
 		// attack physics handler
+		if (!PhysicsHandle) { return; }
 		PhysicsHandle->GrabComponentAtLocationWithRotation(
 			ComponentToGrab,
 			NAME_None,
@@ -72,6 +73,7 @@ void UGrabber::Grab() {
 
 }
 void UGrabber::Release() {
+	if (!PhysicsHandle) { return; }
 	UE_LOG(LogTemp, Warning, TEXT("Grab released"));
 	PhysicsHandle->ReleaseComponent();
 }
@@ -84,7 +86,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	
 	
-
+	if (!PhysicsHandle) { return; }
 	if (PhysicsHandle->GrabbedComponent) {
 		PhysicsHandle->SetTargetLocation( GetReachLineEnd() );
 	}

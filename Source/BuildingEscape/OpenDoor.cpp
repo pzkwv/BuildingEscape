@@ -22,6 +22,7 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 	Owner = GetOwner();
+
 	//OpenDoor();
 	//ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 	
@@ -29,7 +30,8 @@ void UOpenDoor::BeginPlay()
 
 void UOpenDoor::OpenDoor() {
 	//AActor* Owner = GetOwner();
-	Owner->SetActorRotation(FRotator(0.0f, OpenAngle, 0.0f));
+	//Owner->SetActorRotation(FRotator(0.0f, OpenAngle, 0.0f));
+	OnOpen.Broadcast();
 }
 
 void UOpenDoor::CloseDoor() {
@@ -46,11 +48,21 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	//pool the trigger volume
 	//if the ActorThatOpens is in the volume
 	//if (PressurePlate->IsOverlappingActor(ActorThatOpens) ) {
-	if ( GetTotalMassOfActorsOnPlate() > 50.f) {
-		OpenDoor();
+	if (!PressurePlate) {
+		UE_LOG(LogTemp, Warning, TEXT("GetTotalMassOfActorsOnPlate <PressurePlate> undefined"));
+		return;
+	}
+	if (!Owner) {
+		UE_LOG(LogTemp, Warning, TEXT("GetTotalMassOfActorsOnPlate <Owner> undefined"));
+		return;
+	}
+	if ( GetTotalMassOfActorsOnPlate() > TriggerMass) {
+		//OpenDoor();
+		OnOpen.Broadcast();
 		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
 	} else {
-		CloseDoor();
+		//CloseDoor();
+		OnClose.Broadcast();
 	}
 	if ( GetWorld()->GetTimeSeconds() > LastDoorOpenTime+DoorCloseDelay ) {
 		//CloseDoor();
